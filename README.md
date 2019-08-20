@@ -56,5 +56,5 @@ Run the maven build command and run the spring boot application
 > mvn build; mvn spring-boot:run
 
 Let me know if you see any possible improvements or errors in the application. You can reach out to me at: <br>
-[LinkedIn](linkedin.com/in/kratipaw) <br>
-[Twitter](twitter.com/kratipaw)
+[LinkedIn](https://linkedin.com/in/kratipaw) <br>
+[Twitter](https://twitter.com/krati_paw)
