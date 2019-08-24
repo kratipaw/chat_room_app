@@ -1,4 +1,6 @@
 # Chat Room
+[Check Code here](https://github.com/kratipaw/chat_room_app)
+
 # Introduction
 This application is a simple chat room application developed using web-sockets in Java. The basic tasks users can perform are:
 - entering a room
