@@ -29,14 +29,8 @@ public class WebSocketChatServer {
     private static void sendMessageToAll(String msg) {
         //TODO: add send message method.
         try {
-            if(msg != null){
-                //fastjson to convert json msg to java object
-                Message message = JSON.parseObject(msg, Message.class);
-                message.setOnlineCount(onlineSessions.values().size());
-                String jsonMsg = JSON.toJSONString(message);
-                for(Session session:onlineSessions.values()){
-                    session.getBasicRemote().sendText(jsonMsg);
-                }
+            for(Session session:onlineSessions.values()){
+                session.getBasicRemote().sendText(msg);
             }
         } catch (IOException e) {
             e.printStackTrace();
@@ -49,10 +43,9 @@ public class WebSocketChatServer {
     @OnOpen
     public void onOpen(Session session, @PathParam("username") String username) {
         //TODO: add on open connection.
-
-        if(username != null) {
-            onlineSessions.put(session.getId(), session);
-        }
+        onlineSessions.put(session.getId(), session);
+        Message message = new Message(null, null, onlineSessions.size(), "ENTER");
+        sendMessageToAll(JSON.toJSONString(message));
     }
 
     /**
@@ -61,7 +54,9 @@ public class WebSocketChatServer {
     @OnMessage
     public void onMessage(Session session, String jsonStr) {
         //TODO: add send message.
-        sendMessageToAll(jsonStr);
+        Message message = JSON.parseObject(jsonStr, Message.class);
+        message.setOnlineCount(onlineSessions.values().size());
+        sendMessageToAll(JSON.toJSONString(message));
     }
 
     /**
@@ -70,7 +65,12 @@ public class WebSocketChatServer {
     @OnClose
     public void onClose(Session session) {
         //TODO: add close connection.
-        onlineSessions.remove(session.getId());
+        try {
+            onlineSessions.remove(session.getId());
+            session.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     /**
@@ -80,5 +80,4 @@ public class WebSocketChatServer {
     public void onError(Session session, Throwable error) {
         error.printStackTrace();
     }
-
 }
