@@ -50,17 +50,12 @@ Its the maven build file with dependency on spring-boot-starter-web, spring-boot
 ### Run the application with command
 Clone the repository with,
 ```bash
-git clone https://github.com/kratipaw/chat_room_app.git
+$ git clone https://github.com/kratipaw/chat_room_app.git
 ```
 
-Navigate to the root directory i.e. chat_room_app
+Navigate to the root directory i.e. chat_room_app and Run the maven build command and run the spring boot application
 ```bash
-cd chat_room_app
-```
-
-Run the maven build command and run the spring boot application
-```bash
-mvn build; mvn spring-boot:run
+$ cd chat_room_app; mvn build; mvn spring-boot:run
 ```
 
 Let me know if you see any possible improvements or errors in the application. You can reach out to me at: <br>
