@@ -8,10 +8,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.web.socket.WebSocketSession;
 
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
@@ -44,14 +41,6 @@ public class WebSocketChatServerTest {
                 .andExpect(status().isOk())
                 .andExpect(view().name("chat"))
                 .andExpect(model().attribute("username", "joey"));
-    }
-
-    @Test
-    public void chat() {
-
-        WebSocketSession session = mock(WebSocketSession.class);
-
-        when(session.isOpen()).thenReturn(true);
     }
 
 }
