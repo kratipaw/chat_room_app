@@ -14,7 +14,7 @@ public class LoginController {
         model.addAttribute("username", username);
         model.addAttribute("webSocketUrl", "ws://localhost:8080/chat/" + username);
 
-        return "chat";
+        return "/chat";
     }
 
 }
