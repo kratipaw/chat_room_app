@@ -1,46 +1,93 @@
 package edu.udacity.java.nano.chat;
 
+import edu.udacity.java.nano.pages.ChatHtml;
+import edu.udacity.java.nano.pages.LoginHtml;
+import org.checkerframework.checker.nullness.compatqual.NullableDecl;
+import org.junit.After;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.http.MediaType;
-import org.springframework.test.context.junit4.SpringRunner;
-import org.springframework.test.web.servlet.MockMvc;
+import org.openqa.selenium.By;
+import org.openqa.selenium.WebElement;
+import org.openqa.selenium.htmlunit.HtmlUnitDriver;
+import org.openqa.selenium.support.ui.ExpectedCondition;
+import org.openqa.selenium.support.ui.WebDriverWait;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.test.context.web.WebAppConfiguration;
+import org.openqa.selenium.WebDriver;
 
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
-
-@RunWith(SpringRunner.class)
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-@AutoConfigureMockMvc
+@RunWith(SpringJUnit4ClassRunner.class)
+@ContextConfiguration(classes = {WebSocketConfig.class})
+@WebAppConfiguration
 public class WebSocketChatServerTest {
 
-    @Autowired
-    private  MockMvc mockMvc;
+    private WebDriver webDriver;
 
-    private Message message;
+    @Before
+    public void setup() {
+        webDriver = new HtmlUnitDriver(true);
+    }
 
-    @Test
-    public void login() throws Exception {
-        this.mockMvc.perform(get("/"))
-                    .andDo(print())
-                    .andExpect(status().isOk())
-                    .andExpect(view().name("/login"));
+    @After
+    public void destroy() {
+        if (webDriver != null) {
+            webDriver.close();
+        }
     }
 
     @Test
-    public void login_withUserName() throws Exception {
-        this.mockMvc.perform(post("/login")
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .param("username", "joey"))
-                .andDo(print())
-                .andExpect(status().isOk())
-                .andExpect(view().name("chat"))
-                .andExpect(model().attribute("username", "joey"));
+    public void loginAndJoin() throws Exception{
+        LoginHtml page = LoginHtml.to(webDriver);
+        ChatHtml chat = page.loginAndJoin("joey");
+
+        (new WebDriverWait(chat.webDriver, 10)).until(new ExpectedCondition<Boolean>() {
+            @NullableDecl
+            @Override
+            public Boolean apply(@NullableDecl WebDriver input) {
+                System.out.println("username: " + chat.getUsername().getText());
+                return chat.getUsername().getText().equals(page.getUsernameText());
+            }
+        });
     }
+
+    @Test
+    public void chat() throws Exception {
+        LoginHtml page = LoginHtml.to(webDriver);
+        ChatHtml chat = page.loginAndJoin("joey");
+        chat.sendChatMessage("Hey!! How you doin?");
+
+        (new WebDriverWait(webDriver, 10)).until(new ExpectedCondition<Boolean>() {
+            @NullableDecl
+            @Override
+            public Boolean apply(@NullableDecl WebDriver input) {
+                System.out.println("current URL: " + chat.getCurrentUrl());
+                return chat.getMessageContent() != null && chat.getMessageContent().getText().contains(page.getUsernameText());
+            }
+        });
+    }
+
+    @Test
+    public void logout() throws Exception {
+
+        LoginHtml page = LoginHtml.to(webDriver);
+        ChatHtml chat = page.loginAndJoin("joey");
+        chat.sendChatMessage("Hey!! How you doin?");
+
+
+        WebElement element = webDriver.findElement(By.id("logout"));
+
+        element.click();
+
+        (new WebDriverWait(webDriver, 10)).until(new ExpectedCondition<Boolean>() {
+            @NullableDecl
+            @Override
+            public Boolean apply(@NullableDecl WebDriver input) {
+                System.out.println("logout triggered. current URL: " + webDriver.getCurrentUrl());
+                return webDriver.getCurrentUrl().equals("http://localhost:8080/");
+            }
+        });
+    }
+
 
 }
